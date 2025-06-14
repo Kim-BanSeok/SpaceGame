@@ -69,7 +69,6 @@
             51%, 100% { opacity: 0; }
         }
         
-        /* 모바일 터치 영역 */
         .touch-area {
             position: absolute;
             bottom: 0;
@@ -107,7 +106,7 @@
             <h2>🛸 UFO 운석 피하기 🛸</h2>
             <p>PC: 화살표 키로 좌우 이동</p>
             <p>모바일: 화면 좌우 터치로 이동</p>
-            <p class="blink">스페이스바를 눌러 시작하세요!</p>
+            <p class="blink">스페이스바를 눌러 시작하세요!<br>스페이스바를 누르면 미사일 발사!</p>
         </div>
         
         <div id="gameOver">
@@ -148,6 +147,12 @@
         let meteors = [];
         const meteorSpeed = 3;
         const meteorSpawnRate = 60; // 60프레임마다 생성
+
+        // [추가] 미사일 배열
+        let missiles = [];
+        const missileSpeed = 10;
+        const missileWidth = 4;
+        const missileHeight = 12;
 
         // UFO 도트맵 (반원형 모양)
         const ufoPixelMap = [
@@ -225,6 +230,17 @@
             }
         }
 
+        // [추가] 미사일 그리기
+        function drawMissile(missile) {
+            ctx.fillStyle = '#ffff00';
+            ctx.fillRect(
+                missile.x - missileWidth/2,
+                missile.y - missileHeight/2,
+                missileWidth,
+                missileHeight
+            );
+        }
+
         // 별 배경 그리기
         function drawStars() {
             ctx.fillStyle = '#ffffff';
@@ -255,11 +271,51 @@
                    rect1.y + rect1.height > rect2.y;
         }
 
+        // [추가] 미사일 발사
+        function fireMissile() {
+            if (gameState !== 'playing') return;
+            missiles.push({
+                x: ufo.x,
+                y: ufo.y - ufo.height/2 - missileHeight/2
+            });
+        }
+
+        // [추가] 미사일 이동 및 화면 밖 제거
+        function updateMissiles() {
+            missiles = missiles.filter(missile => {
+                missile.y -= missileSpeed;
+                return missile.y + missileHeight/2 > 0;
+            });
+        }
+
+        // [추가] 미사일과 운석 충돌 처리
+        function missileMeteorCollision() {
+            for (let i = missiles.length - 1; i >= 0; i--) {
+                const missile = missiles[i];
+                for (let j = meteors.length - 1; j >= 0; j--) {
+                    const meteor = meteors[j];
+                    // 미사일 직사각형, 운석 직사각형 충돌 체크
+                    if (
+                        missile.x - missileWidth/2 < meteor.x + meteor.width/2 &&
+                        missile.x + missileWidth/2 > meteor.x - meteor.width/2 &&
+                        missile.y - missileHeight/2 < meteor.y + meteor.height/2 &&
+                        missile.y + missileHeight/2 > meteor.y - meteor.height/2
+                    ) {
+                        // 운석과 미사일 제거
+                        meteors.splice(j, 1);
+                        missiles.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        }
+
         // 게임 시작
         function startGame() {
             gameState = 'playing';
             gameStartTime = Date.now();
             meteors = [];
+            missiles = []; // 미사일 초기화
             ufo.x = canvas.width / 2;
             instructionsDiv.style.display = 'none';
             gameOverDiv.style.display = 'none';
@@ -292,7 +348,13 @@
                 return meteor.y < canvas.height + 20;
             });
 
-            // 충돌 감지
+            // 미사일 이동
+            updateMissiles();
+
+            // 미사일과 운석 충돌
+            missileMeteorCollision();
+
+            // 충돌 감지 (UFO와 운석)
             for (let meteor of meteors) {
                 if (checkCollision(
                     {x: ufo.x - ufo.width/2, y: ufo.y - ufo.height/2, width: ufo.width, height: ufo.height},
@@ -318,6 +380,9 @@
 
                 // 운석들 그리기
                 meteors.forEach(drawMeteor);
+
+                // 미사일들 그리기
+                missiles.forEach(drawMissile);
             }
         }
 
@@ -333,11 +398,12 @@
         
         document.addEventListener('keydown', (e) => {
             keys[e.key] = true;
-            
             if (e.key === ' ') {
                 e.preventDefault();
                 if (gameState === 'waiting' || gameState === 'gameOver') {
                     startGame();
+                } else if (gameState === 'playing') {
+                    fireMissile(); // 미사일 발사
                 }
             }
         });
