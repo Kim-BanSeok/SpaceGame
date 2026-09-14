@@ -70,4 +70,13 @@ document.getElementById('title').textContent='NEBULA RUN';document.getElementByI
 </script>
 <script>
 const menuBegin=begin,menuOver=over;begin=function(){[kicker,subtitle,brief,footer].forEach(el=>el.style.display='');menuBegin()};over=function(){menuOver();[subtitle,brief,footer].forEach(el=>el.style.display='none')};
-</script></body></html>
+</script>
+<script>
+/* Mission progression layer: three phases and a survival objective. */
+const phaseStyle=document.createElement('style');phaseStyle.textContent='.phase-badge{position:absolute;left:50%;top:20px;transform:translateX(-50%);padding:7px 13px;border:1px solid #7beeff33;border-radius:99px;background:#080d26bb;color:#aeefff;font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;backdrop-filter:blur(9px);z-index:3}.phase-badge em{color:#ff9fe0;font-style:normal;margin-left:7px}';document.head.appendChild(phaseStyle);
+const phaseBadge=document.createElement('div');phaseBadge.className='phase-badge';app.appendChild(phaseBadge);let missionWon=false;
+const missionBegin=begin;begin=function(){missionWon=false;phaseBadge.style.display='block';missionBegin()};
+function completeMission(){if(missionWon)return;missionWon=true;s.play=false;phaseBadge.style.display='none';title.textContent='Mission Complete';message.textContent='Lumen Ark의 구조 신호를 확보했다. 네뷸라를 탈출하라.';start.textContent='REPLAY MISSION';overlay.classList.remove('hidden');showStory('LUMEN ARK / RECOVERED','신호의 발신자는 아직 살아 있다. 다음 좌표가 잠금 해제됐다.')}
+setInterval(()=>{if(!s.play)return;const t=s.t;if(t>=90){completeMission();return}let label='PHASE 01 / ENTRY',detail='debris field';if(t>=55){label='PHASE 03 / THE VEIL';detail='unknown signal'}else if(t>=25){label='PHASE 02 / CONTACT';detail='hostile trajectory'}phaseBadge.innerHTML=label+'<em>'+detail+'</em>'},250);
+</script>
+<script>const missionOver=over;over=function(){phaseBadge.style.display='none';missionOver()};</script></body></html>
