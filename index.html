@@ -42,4 +42,19 @@ function drawRock(r){
   const craters=[[-.35,-.28,.16],[.28,-.05,.12],[-.08,.36,.2]];craters.forEach((q,i)=>{const cg=x.createRadialGradient(q[0]*r.r-.04*r.r,q[1]*r.r-.05*r.r,1,q[0]*r.r,q[1]*r.r,q[2]*r.r);cg.addColorStop(0,'#24163e');cg.addColorStop(.7,'#4b2a6b');cg.addColorStop(1,'#bd75bc55');x.fillStyle=cg;x.beginPath();x.arc(q[0]*r.r,q[1]*r.r,q[2]*r.r,0,Math.PI*2);x.fill()});
   x.globalCompositeOperation='lighter';x.fillStyle='#ffb26f99';x.beginPath();x.arc(-r.r*.45,r.r*.28,Math.max(1.5,r.r*.055),0,Math.PI*2);x.fill();x.fillStyle='#9deaff99';x.beginPath();x.arc(r.r*.34,-r.r*.35,Math.max(1,r.r*.045),0,Math.PI*2);x.fill();x.restore();
 }
+</script>
+<script>
+/* Lightweight narrative layer: story text only, gameplay rules remain unchanged. */
+const storyStyle=document.createElement('style');storyStyle.textContent='.story-banner{position:absolute;left:50%;top:72px;transform:translateX(-50%) translateY(-8px);width:min(560px,calc(100% - 32px));padding:11px 16px;border:1px solid #7beeff44;border-radius:14px;background:#070b1dcc;color:#dceaff;text-align:center;font-size:12px;line-height:1.5;letter-spacing:.03em;opacity:0;pointer-events:none;backdrop-filter:blur(12px);box-shadow:0 0 28px #7beeff22;transition:.35s ease;z-index:4}.story-banner.show{opacity:1;transform:translateX(-50%) translateY(0)}.story-banner b{display:block;margin-bottom:3px;color:#7beeff;font-size:10px;letter-spacing:.18em;text-transform:uppercase}';document.head.appendChild(storyStyle);
+const storyBanner=document.createElement('div');storyBanner.className='story-banner';app.appendChild(storyBanner);let storyTimer;
+const storyBeats=[
+  [0,'MISSION LOG 01','2147년. 구조선 Lumen Ark의 신호가 네뷸라 경계에서 끊겼다.'],
+  [12,'MISSION LOG 02','운석의 궤도가 이상하다. 이건 자연적인 소행성 지대가 아니다.'],
+  [28,'MISSION LOG 03','신호가 다시 잡혔다. 누군가 이 지대를 통과하지 못하게 막고 있다.'],
+  [48,'MISSION LOG 04','잔해 사이에서 검은 구조물이 감지된다. 네뷸라의 중심으로 진입한다.'],
+  [72,'MISSION LOG 05','Lumen Ark의 마지막 메시지: “빛을 따라오지 마. 그것이 우리를 보고 있다.”']
+];
+function showStory(label,text){storyBanner.innerHTML='<b>'+label+'</b>'+text;storyBanner.classList.add('show');clearTimeout(storyTimer);storyTimer=setTimeout(()=>storyBanner.classList.remove('show'),5200)}
+const baseBegin=begin,baseOver=over;begin=function(){baseBegin();message.textContent='Lumen Ark의 마지막 신호를 따라 네뷸라를 통과하라.';showStory(storyBeats[0][1],storyBeats[0][2]);};over=function(){baseOver();title.textContent='Signal Lost';message.textContent='Lumen Ark의 신호는 다시 어둠 속으로 사라졌다. 하지만 기록은 남았다.';showStory('FINAL TRANSMISSION','구조 신호가 끊겼다. 다음 파일럿은 이 기록을 찾게 될 것이다.');};
+let lastBeat=-1;setInterval(()=>{if(!s.play)return;for(let i=storyBeats.length-1;i>=0;i--){if(s.t>=storyBeats[i][0]&&lastBeat<i){lastBeat=i;showStory(storyBeats[i][1],storyBeats[i][2]);break}}},500);const oldBegin=begin;begin=function(){lastBeat=-1;oldBegin()};
 </script></body></html>
