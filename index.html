@@ -30,4 +30,16 @@ function drawShip(){
   const glass=x.createLinearGradient(0,-21,0,2);glass.addColorStop(0,'#f7ffff');glass.addColorStop(.4,'#63e5ff');glass.addColorStop(1,'#3346a6');x.fillStyle=glass;x.beginPath();x.ellipse(0,-8,7.5,10,0,0,Math.PI*2);x.fill();x.strokeStyle='#d8ffff';x.lineWidth=1;x.stroke();
   x.shadowBlur=0;x.fillStyle='#ff8ed8';[-7,7].forEach(l=>{x.beginPath();x.arc(l,12,2,0,Math.PI*2);x.fill()});x.restore();
 }
+</script>
+<script>
+/* Faceted asteroid skin: visual-only override. */
+function drawRock(r){
+  x.save(); x.translate(r.x,r.y); x.rotate(r.a);
+  const pulse=.5+.5*Math.sin(r.a*1.7), rim=x.createRadialGradient(-r.r*.38,-r.r*.5,1,r.r*.1,r.r*.15,r.r*1.15);
+  rim.addColorStop(0,'#ffe1ff');rim.addColorStop(.18,'#d98dce');rim.addColorStop(.48,pulse>.55?'#8b4f9f':'#714c9c');rim.addColorStop(1,'#1d173f');x.fillStyle=rim;x.shadowColor='#ba68e866';x.shadowBlur=18;
+  x.beginPath();for(let i=0;i<10;i++){const a=i*Math.PI*2/10,rr=r.r*(.76+Math.sin(i*5.9+r.a)*.18),px=Math.cos(a)*rr,py=Math.sin(a)*rr;i?x.lineTo(px,py):x.moveTo(px,py)}x.closePath();x.fill();x.shadowBlur=0;
+  x.strokeStyle='#ffc0ee55';x.lineWidth=1.2;x.stroke();
+  const craters=[[-.35,-.28,.16],[.28,-.05,.12],[-.08,.36,.2]];craters.forEach((q,i)=>{const cg=x.createRadialGradient(q[0]*r.r-.04*r.r,q[1]*r.r-.05*r.r,1,q[0]*r.r,q[1]*r.r,q[2]*r.r);cg.addColorStop(0,'#24163e');cg.addColorStop(.7,'#4b2a6b');cg.addColorStop(1,'#bd75bc55');x.fillStyle=cg;x.beginPath();x.arc(q[0]*r.r,q[1]*r.r,q[2]*r.r,0,Math.PI*2);x.fill()});
+  x.globalCompositeOperation='lighter';x.fillStyle='#ffb26f99';x.beginPath();x.arc(-r.r*.45,r.r*.28,Math.max(1.5,r.r*.055),0,Math.PI*2);x.fill();x.fillStyle='#9deaff99';x.beginPath();x.arc(r.r*.34,-r.r*.35,Math.max(1,r.r*.045),0,Math.PI*2);x.fill();x.restore();
+}
 </script></body></html>
