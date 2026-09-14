@@ -109,4 +109,9 @@ const weaponStyle=document.createElement('style');weaponStyle.textContent='.weap
 const weaponBadge=document.createElement('div');weaponBadge.className='weapon-badge';app.appendChild(weaponBadge);s.kills=0;
 function renderWeapon(){const twin=(s.kills||0)>=10;weaponBadge.innerHTML='WEAPON <b>'+(twin?'TWIN SHOT':'PULSE')+'</b> · '+(s.kills||0)+'/10'}renderWeapon();
 const upgradeBegin=begin;begin=function(){s.kills=0;renderWeapon();upgradeBegin()};const upgradeFire=fire;fire=function(){upgradeFire();if(s.play&&(s.kills||0)>=10)shots.push({x:ship.x+9,y:ship.y-25})};const upgradeSpark=spark;spark=function(px,py,color){if(color==='#7beeff'&&s.play){s.kills=(s.kills||0)+1;if(s.kills===10)showStory('WEAPON UPGRADE','쌍발 펄스 캐논이 해금됐다. 네뷸라의 방어선을 돌파하라.');renderWeapon()}upgradeSpark(px,py,color)};setInterval(()=>{if(s.play)renderWeapon()},350);
+</script>
+<script>
+/* Asteroid variants: visual and movement modifiers only. */
+const baseRockSpawn=rock;rock=function(){baseRockSpawn();const r=rocks[rocks.length-1],roll=Math.random();if(roll<.16){r.kind='heavy';r.r*=1.38;r.vy*=.62}else if(roll<.34){r.kind='crystal';r.r*=.72;r.vy*=1.42}else r.kind='standard'};
+const baseRockDraw=drawRock;drawRock=function(r){baseRockDraw(r);x.save();x.translate(r.x,r.y);x.rotate(r.a);if(r.kind==='heavy'){x.strokeStyle='#ff806caa';x.lineWidth=2.5;x.shadowColor='#ff4d4d';x.shadowBlur=13;x.beginPath();x.arc(0,0,r.r+4,0,Math.PI*2);x.stroke()}else if(r.kind==='crystal'){x.globalCompositeOperation='lighter';x.fillStyle='#8ffaff99';x.shadowColor='#65efff';x.shadowBlur=15;x.beginPath();x.moveTo(0,-r.r*1.35);x.lineTo(r.r*.42,-r.r*.2);x.lineTo(0,r.r*1.35);x.lineTo(-r.r*.42,-r.r*.2);x.closePath();x.fill()}x.restore()};
 </script></body></html>
