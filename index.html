@@ -95,4 +95,11 @@ audioToggle.addEventListener('click',()=>{muted=!muted;audioToggle.textContent=m
 function togglePause(){if(launching||missionWon)return;if(s.play){s.play=false;pauseStarted=performance.now();pauseOverlay.classList.add('show')}else if(pauseOverlay.classList.contains('show')){s.start+=performance.now()-pauseStarted;s.last=performance.now();s.play=true;pauseOverlay.classList.remove('show')}}
 const feedbackBegin=begin,feedbackFire=fire,feedbackSpark=spark;begin=function(){feedbackBegin();launchTone()};fire=function(){feedbackFire();fireTone()};spark=function(px,py,color){feedbackSpark(px,py,color);color=== '#ff77c9'?hitTone():breakTone()};
 window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='p'||e.key==='Escape'){e.preventDefault();togglePause()}});
+</script>
+<script>
+/* Local pilot record system. */
+const recordStyle=document.createElement('style');recordStyle.textContent='.record-badge{position:absolute;left:22px;bottom:53px;padding:8px 11px;border:1px solid #fff2;border-radius:99px;background:#090d22cc;color:#9ba7cf;font-size:10px;letter-spacing:.08em;backdrop-filter:blur(8px);z-index:4}.record-badge b{color:#7beeff;margin-left:5px}@media(max-width:700px){.record-badge{left:14px;bottom:13px}}';document.head.appendChild(recordStyle);
+const recordBadge=document.createElement('div');recordBadge.className='record-badge';app.appendChild(recordBadge);const recordKey='spacegame-pilot-record';
+function readRecord(){try{return JSON.parse(localStorage.getItem(recordKey)||'{"bestTime":0,"bestScore":0,"missions":0}')}catch{return{bestTime:0,bestScore:0,missions:0}}}function writeRecord(time,score,mission){const r=readRecord();r.bestTime=Math.max(r.bestTime,time);r.bestScore=Math.max(r.bestScore,score);if(mission)r.missions++;localStorage.setItem(recordKey,JSON.stringify(r));renderRecord()}function renderRecord(){const r=readRecord();recordBadge.innerHTML='BEST <b>'+fmt(r.bestTime)+'</b> · <b>'+String(r.bestScore).padStart(4,'0')+'</b> · OPS <b>'+r.missions+'</b>'}renderRecord();
+const recordOver=over;over=function(){writeRecord(s.t,Math.floor(s.score+s.t*10),false);recordOver()};const recordComplete=completeMission;completeMission=function(){writeRecord(s.t,Math.floor(s.score+s.t*10),true);recordComplete()};
 </script></body></html>
